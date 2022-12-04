@@ -5,27 +5,20 @@
 
 run() ->
 	{ok, Fd} = file:open("input", read),
-	{Elf, Calories} = read_lines(Fd, {1, 0}, {0, 0}),
+	AllElves = read_lines(Fd, {1, 0}, []),
+	[{Elf, Calories}|_] = lists:reverse(lists:sort(fun({_, Cl}, {_, Cr}) -> Cl =< Cr end, AllElves)),
 	io:format("Elf #~w: ~w calories~n", [Elf, Calories]).
 
-read_lines(Fd, C = {CurElf, CurCal}, M) ->
+read_lines(Fd, Acc={Elf, Calories}, List) ->
 	case io:get_line(Fd, '') of
-		eof ->	elf_with_more_calories(C, M);
+		eof ->	[Acc|List];
 		{error, Descr} ->	{error, Descr};
-		[10] ->
-			% io:format("~w: ~w~n", [CurElf, CurCal]),
-			read_lines(Fd, {CurElf + 1, 0}, elf_with_more_calories(C, M));
+		[10] ->	read_lines(Fd, {Elf + 1, 0}, [Acc|List]);
 		L ->
 			N = list_to_integer(trim_newline(L)),
-			read_lines(Fd, {CurElf, CurCal + N}, M)
+			read_lines(Fd, {Elf, Calories + N}, List)
 	end.
 
 trim_newline([]) -> [];
 trim_newline([10]) -> [];
 trim_newline([H|T]) -> [H|trim_newline(T)].
-
-elf_with_more_calories(E1 = {_, C1}, E2 = {_, C2}) ->
-	if
-		C1 >= C2 ->	E1;
-		true ->		E2
-	end.
