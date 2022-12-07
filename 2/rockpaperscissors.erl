@@ -30,18 +30,15 @@ shape($C) ->	scissors;
 shape($Z) ->	scissors.
 
 play({Opponent, Player}) ->
-	{_, P} = result(Opponent, Player),
-	P + value(Player).
+	value(result(Opponent, Player)) + value(Player).
 
-result(rock, rock) ->	{3, 3};
-result(rock, paper) ->	{0, 6};
-result(rock, scissors) ->	{6, 0};
-result(paper, rock) ->	{6, 0};
-result(paper, paper) ->	{3, 3};
-result(paper, scissors) ->	{0, 6};
-result(scissors, rock) ->	{0, 6};
-result(scissors, paper) ->	{6, 0};
-result(scissors, scissors) ->	{3, 3}.
+result(Choice, Choice) ->	draw;
+result(rock, paper) ->	win;
+result(rock, scissors) ->	lose;
+result(paper, rock) ->	lose;
+result(paper, scissors) ->	win;
+result(scissors, rock) ->	win;
+result(scissors, paper) ->	lose.
 
 value(rock) ->	1;
 value(paper) ->	2;
