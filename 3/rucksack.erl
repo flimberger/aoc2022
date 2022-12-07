@@ -1,5 +1,5 @@
 -module(rucksack).
--export([puzzle1/1]).
+-export([puzzle1/1, puzzle2/1]).
 
 puzzle1(Filename) ->
 	L = read_input(Filename),
@@ -37,3 +37,25 @@ drippleout([], _) ->	invalid_input.
 
 priority(I) when I >= $A, I =< $Z ->	I - $A + 27;
 priority(I) when I >= $a, I =< $z ->	I - $a + 1.
+
+puzzle2(Filename) ->
+	L = read_input(Filename),
+	C = lists:map(fun({A, B, C}) -> common(A, B, C) end, group(L)),
+	S = lists:sum(lists:map(fun priority/1, C)),
+	io:format("~w~n", [S]).
+
+group(L) ->
+	group(L, []).
+group([A,B,C|L], Groups) ->
+	group(L, [{A, B, C}|Groups]);
+group([], Groups) ->
+	Groups.
+
+common([A|Tail], B, C) ->
+	case member(A, B, C) of
+		true ->	A;
+		false -> common(Tail, B, C)
+	end.
+
+member(Elem, A, B) ->
+	lists:member(Elem, A) and lists:member(Elem, B).
