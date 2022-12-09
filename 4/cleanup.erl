@@ -1,11 +1,11 @@
 -module(cleanup).
--export([puzzle1/1, test1/0]).
+-export([puzzle1/1, test1/0, puzzle2/1, test2/0]).
 
 puzzle1(Filename) ->
 	L = read_input(Filename),
 	D = lists:filter(fun({A, B}) -> fullycontains(A, B) end, L),
 	io:format("~w~n", [D]),
-	erlang:length(D).
+	length(D).
 
 test1() ->
 	2 = puzzle1("testinput"),
@@ -39,6 +39,20 @@ parse_number([H|T], Delim, Acc) ->
 fullycontains(A, B) ->
 	insideof(A, B) or insideof(B, A).
 
-% guard: when L1 =< U1, L2 =< U2
-insideof({L1, U1}, {L2, U2}) ->
+insideof({L1, U1}, {L2, U2}) when L1 =< U1, L2 =< U2 ->
 	(L1 =< L2) and (U1 >= U2).
+
+puzzle2(Filename) ->
+	L = read_input(Filename),
+	O = lists:filter(fun({A, B}) -> overlaps(A, B) end, L),
+	length(O).
+
+test2() ->
+	4 = puzzle2("testinput"),
+	ok.
+
+overlaps(A={L1, U1}, B={L2, U2}) when L1 =< U1, L2 =< U2 ->
+	inrange(L1, B) or inrange(U1, B) or inrange(L2, A) or inrange(U2, A).
+
+inrange(N, {L, U}) when L =< U ->
+	(N >= L) and (N =< U).
